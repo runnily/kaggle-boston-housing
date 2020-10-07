@@ -20,22 +20,41 @@ class LinearRegressionScratch:
         difference = self.model() - targets
         difference_square = difference*difference
         return torch.sum(difference_square/difference.numel())
+    
+    def gradient(self):
+        with torch.no_grad():
+            # subtracting a small quantity proportional to the gradient 
+            self.weights -= self.weights.grad * 1e-5
+            #  subtracting a small quantity proportional to the gradient
+            self.bias -= self.bias.grad * 1e-5
+            # resets gradients back to 0
+            weights.grad.zero_()
+            bias.grad.zero_()
+    
+    def epochs(self):
+        loss = self.MSE()
+        # loss computes the gradient for every parameter which requires_grad is set to true
+        loss.backward()
+        for _ in range(300):
+            self.gradient()
+        return loss
 
 
 if __name__ == "__main__":
     inputs = torch.from_numpy(inputs_array)
     targets = torch.from_numpy(targets_array)
 
-    # We need 506 randoms weights for each row and column
-    weights = torch.randn(506, 13, requires_grad=True)
+    # There is 1 target value so we need 1 row of random weights
+    # for each input which is multipled
+    weights = torch.randn(1, 13, requires_grad=True)
 
-    # We need 506 biases added to each bias
-    bias = torch.randn(506, requires_grad=True)
+    # There is 1 target value so we need 1 bias added to
+    # each caculation
+    bias = torch.randn(1, requires_grad=True)
+
     linear = LinearRegressionScratch(inputs, targets, weights, bias)
-    print(linear.targets)
-    print(linear.model())
 
-    print(linear.MSE())
+    print(linear.epochs())
 
 
 
