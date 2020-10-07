@@ -1,5 +1,7 @@
 from open_data import inputs_array, targets_array
 import torch
+import numpy
+import pandas as pd
 
 class LinearRegressionScratch:
     """
@@ -11,34 +13,37 @@ class LinearRegressionScratch:
         self.targets = targets
         self.weights = weights
         self.bias = bias
+        self.loss = 1
+        self.TOL = 1e-1
+        self.equal = 20
 
     def model(self):
         # @ is matrix multiplication by pytorch
-        return inputs @ weights.t() + bias
+        return inputs @ self.weights.t() + self.bias
 
     def MSE(self):
-        difference = self.model() - targets
+        # self.model () returns the predictions
+        difference = self.model() - self.targets
         difference_square = difference*difference
-        return torch.sum(difference_square/difference.numel())
+        return torch.sum(difference_square) / difference.numel()
     
     def gradient(self):
-        with torch.no_grad():
-            # subtracting a small quantity proportional to the gradient 
-            self.weights -= self.weights.grad * 1e-5
-            #  subtracting a small quantity proportional to the gradient
-            self.bias -= self.bias.grad * 1e-5
+         with torch.no_grad():
+            # Update weights by subtracting a small quantity proportional to the gradient 
+            self.weights -= self.weights.grad * 1e-6
+            # Update bias by subtracting a small quantity proportional to the gradient
+            self.bias -= self.bias.grad * 1e-6
             # resets gradients back to 0
-            weights.grad.zero_()
-            bias.grad.zero_()
+            self.weights.grad.zero_()
+            self.bias.grad.zero_()
     
     def epochs(self):
-        loss = self.MSE()
-        # loss computes the gradient for every parameter which requires_grad is set to true
-        loss.backward()
-        for _ in range(300):
+        while abs(self.loss - self.equal) <= self.TOL:
+            self.loss = self.MSE() #caculate loss
+            # computes the gradient for every parameter which requires_grad is set to true
+            self.loss.backward()   
             self.gradient()
-        return loss
-
+        
 
 if __name__ == "__main__":
     inputs = torch.from_numpy(inputs_array)
@@ -53,8 +58,16 @@ if __name__ == "__main__":
     bias = torch.randn(1, requires_grad=True)
 
     linear = LinearRegressionScratch(inputs, targets, weights, bias)
+    linear.epochs()
 
-    print(linear.epochs())
+    preds = linear.model()
+    preds_array = preds.detach().numpy()
+
+    df = pd.DataFrame(data=preds_array, columns=["medv"])
+    df.to_csv('Data/preds/boston_preds.csv', index=False)
+
+
+
 
 
 

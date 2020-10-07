@@ -2,6 +2,8 @@
     This is used to open the data within the CSV files
     https://www.kaggle.com/puxama/bostoncsv/tasks
     https://www.kaggle.com/c/boston-housing
+    https://towardsdatascience.com/how-to-read-csv-file-using-pandas-ab1f5e7e7b58
+    https://morphocode.com/pandas-cheat-sheet/
 """
 import pandas as pd
 inputs = pd.read_csv("Data/Boston.csv", usecols=[1,2,3,4,5,6,7,8,9,10,11,12,13])
