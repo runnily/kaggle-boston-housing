@@ -14,7 +14,7 @@ class LinearRegressionScratch:
         self.weights = weights
         self.bias = bias
         self.loss = 0
-        self.TOL = 1e-3
+        self.TOL = 1e-4
 
     def model(self):
         # @ is matrix multiplication by pytorch
