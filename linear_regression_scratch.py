@@ -13,9 +13,8 @@ class LinearRegressionScratch:
         self.targets = targets
         self.weights = weights
         self.bias = bias
-        self.loss = 1
-        self.TOL = 1e-1
-        self.equal = 20
+        self.loss = 0
+        self.TOL = 1e-3
 
     def model(self):
         # @ is matrix multiplication by pytorch
@@ -38,11 +37,16 @@ class LinearRegressionScratch:
             self.bias.grad.zero_()
     
     def epochs(self):
-        while abs(self.loss - self.equal) <= self.TOL:
+        notEqual = True
+        while notEqual:
+            lossTemp = self.loss
             self.loss = self.MSE() #caculate loss
             # computes the gradient for every parameter which requires_grad is set to true
             self.loss.backward()   
+            print(self.loss)
             self.gradient()
+            if (abs(self.loss-lossTemp)<=self.TOL):
+                notEqual = False
         
 
 if __name__ == "__main__":
@@ -57,6 +61,8 @@ if __name__ == "__main__":
     # each caculation
     bias = torch.randn(1, requires_grad=True)
 
+   
+
     linear = LinearRegressionScratch(inputs, targets, weights, bias)
     linear.epochs()
 
@@ -64,7 +70,7 @@ if __name__ == "__main__":
     preds_array = preds.detach().numpy()
 
     df = pd.DataFrame(data=preds_array, columns=["medv"])
-    df.to_csv('Data/preds/boston_preds.csv', index=False)
+    df.to_csv('Data/preds/boston_preds.csv')
 
 
 
