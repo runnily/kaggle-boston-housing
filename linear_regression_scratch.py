@@ -18,12 +18,15 @@ class LinearRegressionScratch:
 
     def model(self):
         # @ is matrix multiplication by pytorch
+        # This would return a 1 dimential matrix with
+        # 506 elements
         return inputs @ self.weights.t() + self.bias
 
     def MSE(self):
         # self.model () returns the predictions
         difference = self.model() - self.targets
         difference_square = difference*difference
+        # Sums of each element within the matrix.
         return torch.sum(difference_square) / difference.numel()
     
     def gradient(self):
